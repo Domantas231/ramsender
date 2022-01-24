@@ -1,8 +1,16 @@
 #include <stdlib.h>
 
+#ifndef "conn_handler.h"
 #include "conn_handler.h"
+#endif
+
+#ifndef "signal_handler.h"
 #include "signal_handler.h"
+#endif
+
+#ifndef "arg_handler.h"
 #include "arg_handler.h"
+#endif
 
 /*
  * MAIN PROGRAM
@@ -24,17 +32,17 @@ int main(int argc, char *argv[])
     argp_parse(&argp, argc, argv, 0, 0, &args);
 
     /*
-     * Create a config file, that 
-     * the device_configure function can later read
-     */
-    create_conf_file(&args);
-
-    /*
      * Configure the connection to the IBM Watson
      * cloud as a device
      */
     IoTPConfig *config = NULL;
     IoTPDevice *device = NULL;
+
+    /*
+     * Create a config file, that 
+     * the device_configure function can later read
+     */
+    create_conf(&config, &args);
 
     device_configure(&config, &device);
 
@@ -42,7 +50,7 @@ int main(int argc, char *argv[])
      * Sends the RAM data to the cloud
      * every n seconds 
      */  
-    send_data(device);
+    send_data(device, *daemonise);
     
     /*
      * Used to cleanly disconnect the device 

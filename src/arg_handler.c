@@ -34,25 +34,3 @@ error_t parse_opt (int key, char *arg, struct argp_state *state){
 
     return 0;
 }
-
-/* 
- * Create a configuration file
- * (.yml type, because the library can't read anything else)
- */
-int create_conf_file(struct arguments *args){
-    FILE *fptr;
-
-    fptr = fopen(CONF_FD, "w");
-
-    fprintf(fptr, "identity: \n");
-    fprintf(fptr, "  orgId: %s\n", args->args[0]);
-    fprintf(fptr, "  typeId: %s\n", args->args[1]);
-    fprintf(fptr, "  deviceId: %s\n\n", args->args[2]);
-
-    fprintf(fptr, "auth: \n");
-    fprintf(fptr, "  token: %s\n", args->args[3]);
-
-    fclose(fptr);
-
-    return 0;
-}

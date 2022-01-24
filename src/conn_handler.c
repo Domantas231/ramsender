@@ -2,6 +2,8 @@
 
 #include "conn_handler.h"
 #include "ubus_handler.h"
+#inlcude "arg_handler.h"
+#include "signal_handler.h"
 
 #define CONF_FD "conn_config.yaml"
 
@@ -96,7 +98,7 @@ int format_ram(struct memory_info mem, char *output, int n){
  * Sends json formated data
  * to the IBM Watson cloud
  */
-int send_data(IoTPDevice *device){
+int send_data(IoTPDevice *device, sig_atomic_t daemonise){
     int rc;
 
     /*
@@ -106,8 +108,7 @@ int send_data(IoTPDevice *device){
      */  
     start_ubus_ctx();
 
-    while(1)
-    {
+    while(daemonise){
         struct memory_info mem;
 
         char data[100];
@@ -121,6 +122,33 @@ int send_data(IoTPDevice *device){
     }
 
     close_ubus_ctx();
+    return 0;
+}
+
+/*
+ * Configure the IoTPDevice variable,
+ * so that it can connect to the correct cloud interface.
+ */
+int create_conf(IoTPConfig **config, struct arguments *args){
+    IoTPConfig_setProperty(*config, "identity.orgId", args.args[0]);
+    IoTPConfig_setProperty(*config, "identity.typeId", args.args[1]);
+    IoTPConfig_setProperty(*config, "identity.deviceId", args.args[2]);
+    IoTPConfig_setProperty(*config, "token.auth", args.args[3]);
+
+
+
+    // FILE *fptr;
+    // fptr = fopen(CONF_FD, "w");
+
+    // fprintf(fptr, "identity: \n");
+    // fprintf(fptr, "  orgId: %s\n", args->args[0]);
+    // fprintf(fptr, "  typeId: %s\n", args->args[1]);
+    // fprintf(fptr, "  deviceId: %s\n\n", args->args[2]);
+
+    // fprintf(fptr, "auth: \n");
+    // fprintf(fptr, "  token: %s\n", args->args[3]);
+
+    // fclose(fptr);
 
     return 0;
 }

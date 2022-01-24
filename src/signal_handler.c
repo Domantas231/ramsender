@@ -3,14 +3,14 @@
 
 #include "signal_handler.h"
 
-/* Signal handler - to support CTRL-C to quit */
-void sigHandler(int signo) {
-    signal(SIGINT, NULL);
-    fprintf(stdout, "Received signal: %d\n", signo);
+void sig_handler(int signo) {
+    *daemonise = 0;
+    printf("got the signal");
 }
 
-/* Set up signal handlers */
 int setup_signals(){
-    signal(SIGINT, sigHandler);
-    signal(SIGTERM, sigHandler);
+    memset(action, 0, sizeof(struct sigaction));
+    (*action).sa_handler = sig_handler;
+    sigaction(SIGTERM, action, NULL);
+    sigaction(SIGINT, action, NULL);
 }
