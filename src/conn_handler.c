@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <syslog.h>
 
 #include "conn_handler.h"
 #include "ubus_handler.h"
@@ -7,15 +8,13 @@
 void logCallback (int level, char * message)
 {
     if (level > 0)
-        fprintf(stdout, "%s\n", message? message:"NULL");
-    fflush(stdout);
+        syslog(LOG_INFO, "%s\n", message? message:"NULL");
 }
 
 void MQTTTraceCallback (int level, char * message)
 {
     if (level > 0)
-        fprintf(stdout, "%s\n", message? message:"NULL");
-    fflush(stdout);
+        syslog(LOG_INFO, "%s\n", message? message:"NULL");
 }
 
 /*
@@ -40,33 +39,38 @@ int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments 
     /* Set IoTP Client log handler */
     rc = IoTPConfig_setLogHandler(IoTPLog_FileDescriptor, stdout);
     if (rc != 0) {
-        fprintf(stderr, "WARN: Failed to set IoTP Client log handler: rc=%d\n", rc);
+        syslog(LOG_WARNING, "WARN: Failed to set IoTP Client log handler: rc=%d\n", rc);
         exit(1);
     }
 
     /*
      * Configure the IoTPConfig object
      */
-    IoTPConfig_create(config, NULL);
+    rc = IoTPConfig_create(config, NULL);
+    if(rc != 0){
+        syslog(LOG_ERR, "ERROR: Failed to create IoTp configure object: rc=%d\n", rc);
+        exit(1);
+    }
+
     create_conf(config, args);
 
     rc = IoTPDevice_create(device, *config);
     if (rc != 0) {
-        fprintf(stderr, "ERROR: Failed to configure IoTP device: rc=%d\n", rc);
+        syslog(LOG_ERR, "ERROR: Failed to configure IoTP device: rc=%d\n", rc);
         exit(1);
     }
 
     /* Set MQTT Trace handler */
     rc = IoTPDevice_setMQTTLogHandler(*device, &MQTTTraceCallback);
     if (rc != 0) {
-        fprintf(stderr, "WARN: Failed to set MQTT Trace handler: rc=%d\n", rc);
+        syslog(LOG_WARNING, "WARN: Failed to set MQTT Trace handler: rc=%d\n", rc);
     }
 
     /* Invoke connection API IoTPDevice_connect() to connect to WIoTP. */
     rc = IoTPDevice_connect(*device);
     if (rc != 0) {
-        fprintf(stderr, "ERROR: Failed to connect to Watson IoT Platform: rc=%d\n", rc);
-        fprintf(stderr, "ERROR: Returned error reason: %s\n", IOTPRC_toString(rc));
+        syslog(LOG_ERR, "ERROR: Failed to connect to Watson IoT Platform: rc=%d\n", rc);
+        syslog(LOG_ERR, "ERROR: Returned error reason: %s\n", IOTPRC_toString(rc));
         exit(1);
     }
 
@@ -79,7 +83,7 @@ int clean_stop_device(IoTPConfig *config, IoTPDevice *device){
     /* Disconnect device */
     rc = IoTPDevice_disconnect(device);
     if (rc != IOTPRC_SUCCESS) {
-        fprintf(stderr, "ERROR: Failed to disconnect from  Watson IoT Platform: rc=%d\n", rc);
+        syslog(LOG_ERR, "ERROR: Failed to disconnect from  Watson IoT Platform: rc=%d\n", rc);
         exit(1);
     }
 
@@ -116,6 +120,7 @@ int send_data(IoTPDevice *device){
      * which is used for getting data about the
      * router's current RAM
      */  
+    syslog(LOG_DEBUG, "Starting ubus context");
     start_ubus_ctx();
 
     while(daemonise){
@@ -124,13 +129,14 @@ int send_data(IoTPDevice *device){
         char data[100];
         format_ram(mem, data, 100);
 
-        fprintf(stdout, "Send status event\n");
+        syslog(LOG_DEBUG, "Send status event\n");
         rc = IoTPDevice_sendEvent(device, "status", data, "json", QoS0, NULL);
-        fprintf(stdout, "RC from publishEvent(): %d\n", rc);
+        syslog(LOG_DEBUG, "RC from publishEvent(): %d\n", rc);
 
         sleep(10);
     }
 
+    syslog(LOG_DEBUG, "Closing ubus context");
     close_ubus_ctx();
     return 0;
 }

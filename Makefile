@@ -15,7 +15,9 @@ endef
 
 define Package/sender/install
 	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/sender $(1)/usr/bin/sender
+	$(INSTALL_BIN) ./files/sender.init $(1)/etc/init.d/sender
 endef
 
 $(eval $(call BuildPackage,sender))
