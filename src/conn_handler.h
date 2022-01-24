@@ -1,5 +1,7 @@
 #include <iotp_device.h>
 
-int device_configure(IoTPConfig **config, IoTPDevice **device);
-int send_data(IoTPDevice *device, sig_atomic_t daemonise);
+#include "arg_handler.h"
+
+int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments args);
+int send_data(IoTPDevice *device);
 int clean_stop_device(IoTPConfig *config, IoTPDevice *device);

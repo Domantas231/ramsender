@@ -1,3 +1,6 @@
+#ifndef ARG_HANDLER_H
+#define ARG_HANDLER_H
+
 #include <argp.h>
 
 struct arguments {
@@ -29,5 +32,6 @@ static const char doc[] = "A simple program that connects to the IBM Watson clou
 
 static const char args_doc[] = "orgID [STRING], typeID [STRING], deviceID [STRING], authToken [STRING]";
 
-int create_conf_file(struct arguments *args);
 error_t parse_opt (int key, char *arg, struct argp_state *state);
+
+#endif

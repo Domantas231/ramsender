@@ -1,16 +1,8 @@
 #include <stdlib.h>
 
-#ifndef "conn_handler.h"
 #include "conn_handler.h"
-#endif
-
-#ifndef "signal_handler.h"
 #include "signal_handler.h"
-#endif
-
-#ifndef "arg_handler.h"
 #include "arg_handler.h"
-#endif
 
 /*
  * MAIN PROGRAM
@@ -38,19 +30,13 @@ int main(int argc, char *argv[])
     IoTPConfig *config = NULL;
     IoTPDevice *device = NULL;
 
-    /*
-     * Create a config file, that 
-     * the device_configure function can later read
-     */
-    create_conf(&config, &args);
-
-    device_configure(&config, &device);
+    device_configure(&config, &device, args);
 
     /*
      * Sends the RAM data to the cloud
      * every n seconds 
      */  
-    send_data(device, *daemonise);
+    send_data(device);
     
     /*
      * Used to cleanly disconnect the device 

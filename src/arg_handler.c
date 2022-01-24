@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "arg_handler.h"
 
-#define CONF_FD "conn_config.yaml"
-
 error_t parse_opt (int key, char *arg, struct argp_state *state){
   /* Get the input argument from argp_parse, which we
      know is a pointer to our arguments structure. */

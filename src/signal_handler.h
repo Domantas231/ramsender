@@ -1,8 +1,9 @@
-#include <signal.h>
+#ifndef SIGNAL_HANDLER_H
+#define SIGNAL_HANDLER_H
 
-volatile sig_atomic_t *daemonise;
-*daemonise = 1;
-
-struct sigaction *action;
+extern volatile sig_atomic_t daemonise;
+extern struct sigaction action;
 
 int setup_signals();
+
+#endif
