@@ -24,9 +24,7 @@ enum {
 	__INFO_MAX,
 };
 
-/*
-* TODO: what is this
-*/
+
 static const struct blobmsg_policy memory_policy[__MEMORY_MAX] = {
 	[TOTAL_MEMORY] = { .name = "total", .type = BLOBMSG_TYPE_INT64 },
 	[FREE_MEMORY] = { .name = "free", .type = BLOBMSG_TYPE_INT64 },
@@ -34,16 +32,11 @@ static const struct blobmsg_policy memory_policy[__MEMORY_MAX] = {
 	[BUFFERED_MEMORY] = { .name = "buffered", .type = BLOBMSG_TYPE_INT64 },
 };
 
-/*
-* TODO: what is this
-*/
+
 static const struct blobmsg_policy info_policy[__INFO_MAX] = {
 	[MEMORY_DATA] = { .name = "memory", .type = BLOBMSG_TYPE_TABLE },
 };
 
-/*
-* TODO: what is this
-*/
 static void board_cb(struct ubus_request *req, int type, struct blob_attr *msg) {
 	struct blob_buf *buf = (struct blob_buf *)req->priv;
 	struct blob_attr *tb[__INFO_MAX];

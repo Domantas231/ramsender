@@ -97,17 +97,23 @@ int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments 
 int clean_stop_device(IoTPConfig *config, IoTPDevice *device){
     int rc = 0;
 
-    /* Disconnect device */
+    /* 
+     * Disconnect device 
+     */
     rc = IoTPDevice_disconnect(device);
     if (rc != IOTPRC_SUCCESS) {
         syslog(LOG_ERR, "ERROR: Failed to disconnect from  Watson IoT Platform: rc=%d\n", rc);
         exit(1);
     }
 
-    /* Destroy client */
+    /* 
+     * Destroy client
+     */
     IoTPDevice_destroy(device);
 
-    /* Clear configuration */
+    /* 
+     * Clear configuration 
+     */
     IoTPConfig_clear(config);
 
     return rc;
