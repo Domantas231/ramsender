@@ -10,8 +10,6 @@
  */
 int main(int argc, char *argv[])
 {
-    int rc = 0;
-
     /* 
      * Set up the signal handlers
      */
@@ -34,8 +32,7 @@ int main(int argc, char *argv[])
     IoTPConfig *config = NULL;
     IoTPDevice *device = NULL;
 
-    if((rc = device_configure(&config, &device, args)) != 0){
-        syslog(LOG_ERR, "Couldn't configure IoTPDevice, rc=%d", rc);
+    if(device_configure(&config, &device, args) != 0){
         clean_stop_device(config, device);
         exit(1);
     }
@@ -45,7 +42,8 @@ int main(int argc, char *argv[])
      * every 10 seconds 
      */
     syslog(LOG_DEBUG, "Starting to send data to the cloud");
-    if((rc = send_data(device)) != 0){
+    if(send_data(device) != 0){
+        clean_stop_device(config, device);
         exit(1);
     }
     
@@ -55,5 +53,5 @@ int main(int argc, char *argv[])
      */
     syslog(LOG_DEBUG, "Cleaning IoTPDevice and IoTPConfig");
     clean_stop_device(config, device);
-    return 0;
+    exit(0);
 }
