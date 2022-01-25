@@ -31,7 +31,7 @@ static const struct blobmsg_policy info_policy[__INFO_MAX] = {
 	[MEMORY_DATA] = { .name = "memory", .type = BLOBMSG_TYPE_TABLE },
 };
 
-static void board_cb(struct ubus_request *req, int type, struct blob_attr *msg) {
+static void memory_cb(struct ubus_request *req, int type, struct blob_attr *msg) {
 	struct memory_info *mem = (struct memory_info *)req->priv;
 	struct blob_attr *tb[__INFO_MAX];
 	struct blob_attr *memory[__MEMORY_MAX];
@@ -57,10 +57,7 @@ static void board_cb(struct ubus_request *req, int type, struct blob_attr *msg) 
 
 extern int start_ubus_ctx(){
 	CTX = ubus_connect(NULL);
-	if (!CTX) {
-		fprintf(stderr, "Failed to connect to ubus\n");
-		return -1;
-	}
+	if (!CTX) return -1;
 
 	return 0;
 }
@@ -72,9 +69,7 @@ extern void close_ubus_ctx(){
 extern int get_memory_info(struct memory_info *mem){
 	uint32_t id;
 
-	if (ubus_lookup_id(CTX, "system", &id) ||
-	    ubus_invoke(CTX, id, "info", NULL, board_cb, mem, 3000)) {
-		fprintf(stderr, "cannot request memory info from procd\n");
+	if (ubus_lookup_id(CTX, "system", &id) || ubus_invoke(CTX, id, "info", NULL, memory_cb, mem, 3000)) {
 		rc=-1;
 	}
 

@@ -7,13 +7,16 @@
 #define N 30
 
 struct arguments {
-    char args[4][N];
+    char orgId[N];
+    char typeId[N];
+    char deviceId[N];
+    char token[N];
 };
 
 extern const char doc[];
 extern const char args_doc[];
+extern struct argp_option options[];
 
-void set_default_values(struct arguments *args);
 error_t parse_opt (int key, char *arg, struct argp_state *state);
 
 #endif

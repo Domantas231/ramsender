@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
      */
     syslog(LOG_DEBUG, "Parsing arguments");
     struct arguments args;
-    struct argp argp = {NULL, parse_opt, args_doc, doc};
+    struct argp argp = {options, parse_opt, args_doc, doc};
     argp_parse(&argp, argc, argv, 0, 0, &args);
 
     /*
@@ -34,14 +34,20 @@ int main(int argc, char *argv[])
     IoTPConfig *config = NULL;
     IoTPDevice *device = NULL;
 
-    device_configure(&config, &device, args);
+    if((rc = device_configure(&config, &device, args)) != 0){
+        syslog(LOG_ERR, "Couldn't configure IoTPDevice, rc=%d", rc);
+        clean_stop_device(config, device);
+        exit(1);
+    }
 
     /*
      * Sends the RAM data to the cloud
-     * every n seconds 
+     * every 10 seconds 
      */
     syslog(LOG_DEBUG, "Starting to send data to the cloud");
-    send_data(device);
+    if((rc = send_data(device)) != 0){
+        exit(1);
+    }
     
     /*
      * Used to cleanly disconnect the device 
