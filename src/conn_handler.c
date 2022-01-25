@@ -28,16 +28,6 @@ int create_conf(IoTPConfig **config, struct arguments args){
     IoTPConfig_setProperty(*config, "identity.deviceId", args.args[2]);
     IoTPConfig_setProperty(*config, "auth.token", args.args[3]);
 
-    if(args.domain[0] != 0) IoTPConfig_setProperty(*config, "options.domain", args.domain);
-    if(args.log_level[0] != 0) IoTPConfig_setProperty(*config, "options.logLevel", args.log_level);
-    if(args.protocol[0] != 0) IoTPConfig_setProperty(*config, "options.mqtt.transport", args.protocol);
-    if(args.ca_file[0] != 0) IoTPConfig_setProperty(*config, "options.mqtt.caFile", args.ca_file);
-
-    if(args.clean_start) IoTPConfig_setProperty(*config, "options.mqtt.cleanStart", "true");
-    if(args.session_expiry) IoTPConfig_setProperty(*config, "options.mqtt.sessionExpiry", args.session_expiry);
-    if(args.keep_alive) IoTPConfig_setProperty(*config, "options.mqtt.keepAlive", args.keep_alive);
-    if(args.port) IoTPConfig_setProperty(*config, "options.mqtt.port", args.port);
-
     return 0;
 }
 

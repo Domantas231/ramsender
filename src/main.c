@@ -23,9 +23,7 @@ int main(int argc, char *argv[])
      */
     syslog(LOG_DEBUG, "Parsing arguments");
     struct arguments args;
-    set_default_values(&args);
-    
-    struct argp argp = {options, parse_opt, args_doc, doc};
+    struct argp argp = {NULL, parse_opt, args_doc, doc};
     argp_parse(&argp, argc, argv, 0, 0, &args);
 
     /*

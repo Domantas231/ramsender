@@ -8,19 +8,8 @@
 
 struct arguments {
     char args[4][N];
-
-    char domain[N];
-    char log_level[N];
-
-    int port;
-    char protocol[10];
-    int clean_start;
-    int session_expiry;
-    int keep_alive;
-    char ca_file[N];
 };
 
-extern const struct argp_option options[];
 extern const char doc[];
 extern const char args_doc[];
 
