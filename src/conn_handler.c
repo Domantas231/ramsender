@@ -5,6 +5,7 @@
 #include "ubus_handler.h"
 #include "signal_handler.h"
 
+
 void logCallback (int level, char * message)
 {
     if (level > 0)
@@ -27,6 +28,16 @@ int create_conf(IoTPConfig **config, struct arguments args){
     IoTPConfig_setProperty(*config, "identity.deviceId", args.args[2]);
     IoTPConfig_setProperty(*config, "auth.token", args.args[3]);
 
+    if(args.domain[0] != 0) IoTPConfig_setProperty(*config, "options.domain", args.domain);
+    if(args.log_level[0] != 0) IoTPConfig_setProperty(*config, "options.logLevel", args.log_level);
+    if(args.protocol[0] != 0) IoTPConfig_setProperty(*config, "options.mqtt.transport", args.protocol);
+    if(args.ca_file[0] != 0) IoTPConfig_setProperty(*config, "options.mqtt.caFile", args.ca_file);
+
+    if(args.clean_start) IoTPConfig_setProperty(*config, "options.mqtt.cleanStart", "true");
+    if(args.session_expiry) IoTPConfig_setProperty(*config, "options.mqtt.sessionExpiry", args.session_expiry);
+    if(args.keep_alive) IoTPConfig_setProperty(*config, "options.mqtt.keepAlive", args.keep_alive);
+    if(args.port) IoTPConfig_setProperty(*config, "options.mqtt.port", args.port);
+
     return 0;
 }
 
@@ -36,7 +47,9 @@ int create_conf(IoTPConfig **config, struct arguments args){
 int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments args){
     int rc = 0;
 
-    /* Set IoTP Client log handler */
+    /* 
+     * Set IoTP Client log handler
+     */
     rc = IoTPConfig_setLogHandler(IoTPLog_FileDescriptor, stdout);
     if (rc != 0) {
         syslog(LOG_WARNING, "WARN: Failed to set IoTP Client log handler: rc=%d\n", rc);
@@ -51,7 +64,6 @@ int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments 
         syslog(LOG_ERR, "ERROR: Failed to create IoTp configure object: rc=%d\n", rc);
         exit(1);
     }
-
     create_conf(config, args);
 
     rc = IoTPDevice_create(device, *config);
@@ -60,13 +72,18 @@ int device_configure(IoTPConfig **config, IoTPDevice **device, struct arguments 
         exit(1);
     }
 
-    /* Set MQTT Trace handler */
+    /* 
+     * Set MQTT Trace handler
+     */
     rc = IoTPDevice_setMQTTLogHandler(*device, &MQTTTraceCallback);
     if (rc != 0) {
         syslog(LOG_WARNING, "WARN: Failed to set MQTT Trace handler: rc=%d\n", rc);
     }
 
-    /* Invoke connection API IoTPDevice_connect() to connect to WIoTP. */
+    /* 
+     * Invoke connection API IoTPDevice_connect() 
+     * to connect to WIoTP. 
+     */
     rc = IoTPDevice_connect(*device);
     if (rc != 0) {
         syslog(LOG_ERR, "ERROR: Failed to connect to Watson IoT Platform: rc=%d\n", rc);
@@ -96,6 +113,9 @@ int clean_stop_device(IoTPConfig *config, IoTPDevice *device){
     return rc;
 }
 
+/*
+ * Formats ram data into a json string format
+ */
 int format_ram(struct memory_info mem, char *output, int n){
     get_memory_info(&mem);
 
